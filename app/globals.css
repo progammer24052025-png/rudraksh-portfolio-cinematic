@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --font-sans: var(--font-body), sans-serif;
+  --font-display: var(--font-heading), sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+  /* Ink black */
+  --background: oklch(0.15 0.005 160);
+  /* Cream */
+  --foreground: oklch(0.95 0.02 90);
+  --card: oklch(0.19 0.008 160);
+  --card-foreground: oklch(0.95 0.02 90);
+  --popover: oklch(0.19 0.008 160);
+  --popover-foreground: oklch(0.95 0.02 90);
+  /* Emerald */
+  --primary: oklch(0.77 0.17 162);
+  --primary-foreground: oklch(0.15 0.005 160);
+  --secondary: oklch(0.24 0.01 160);
+  --secondary-foreground: oklch(0.95 0.02 90);
+  --muted: oklch(0.24 0.01 160);
+  --muted-foreground: oklch(0.68 0.015 120);
+  --accent: oklch(0.77 0.17 162);
+  --accent-foreground: oklch(0.15 0.005 160);
+  --destructive: oklch(0.6 0.2 25);
+  --border: oklch(0.95 0.02 90 / 12%);
+  --input: oklch(0.95 0.02 90 / 15%);
+  --ring: oklch(0.77 0.17 162);
+  --radius: 0.375rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .text-stroke {
+    -webkit-text-stroke: 1px oklch(0.95 0.02 90 / 25%);
+    color: transparent;
+  }
+}
+
+/* Subtle film grain */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.6s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-2%, 3%);
+  }
+  50% {
+    transform: translate(3%, -2%);
+  }
+  75% {
+    transform: translate(-3%, -3%);
+  }
+  100% {
+    transform: translate(2%, 2%);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
