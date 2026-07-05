@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PORTFOLIO } from '@/lib/portfolio-data'
 
@@ -21,6 +22,33 @@ export function Journey() {
           <h2 className="mt-2 font-display text-6xl text-foreground md:text-8xl">
             JOURNEY ARCHIVE<span className="text-primary">.</span>
           </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.8 }}
+          className="mx-auto mt-14 w-full max-w-xs"
+        >
+          <div className="group relative overflow-hidden rounded-lg border border-border">
+            <Image
+              src="/images/rudraksh.jpeg"
+              alt="Portrait of Rudraksh Patel"
+              width={640}
+              height={853}
+              className="h-auto w-full object-cover grayscale transition duration-700 group-hover:grayscale-0"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-primary/15 mix-blend-overlay transition duration-700 group-hover:opacity-0"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background to-transparent px-4 pb-3 pt-10">
+              <span className="text-xs tracking-[0.25em] text-primary">
+                RUDRAKSH PATEL — THE PROTAGONIST
+              </span>
+            </div>
+          </div>
         </motion.div>
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-8 md:grid-cols-[1fr_auto_2fr]">
