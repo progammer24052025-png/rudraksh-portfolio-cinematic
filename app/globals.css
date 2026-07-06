@@ -73,10 +73,29 @@
   .font-display {
     font-family: var(--font-display);
   }
+  .font-cursive {
+    font-family: var(--font-cursive), cursive;
+  }
   .text-stroke {
     -webkit-text-stroke: 1px oklch(0.95 0.02 90 / 25%);
     color: transparent;
   }
+}
+
+/* Typewriter caret blink */
+@keyframes caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-caret {
+  animation: caret-blink 0.9s step-end infinite;
 }
 
 /* Subtle film grain */

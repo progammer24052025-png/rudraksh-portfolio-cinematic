@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Anton, Space_Grotesk } from 'next/font/google'
+import { Anton, Space_Grotesk, Great_Vibes } from 'next/font/google'
 import './globals.css'
 
 const anton = Anton({
@@ -12,6 +12,12 @@ const anton = Anton({
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-body',
+})
+
+const greatVibes = Great_Vibes({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-cursive',
 })
 
 export const metadata: Metadata = {
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`bg-background ${anton.variable} ${spaceGrotesk.variable}`}
+      className={`bg-background ${anton.variable} ${spaceGrotesk.variable} ${greatVibes.variable}`}
     >
       <body className="antialiased font-sans">
         {children}

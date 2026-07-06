@@ -1,14 +1,16 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform, useSpring, type MotionValue } from 'framer-motion'
 import { PORTFOLIO } from '@/lib/portfolio-data'
 
 /**
  * Scroll-driven storytelling hero.
- * Five pose keyframes of the suited figure crossfade as the user scrolls,
- * each paired with a kinetic story line — reads like a movie scrubbed by scroll.
+ * Five pose keyframes crossfade as the user scrolls. The figure blends
+ * seamlessly into the ink background via mix-blend-lighten (pure black
+ * pixels vanish), and story text sits beside the figure — never over
+ * the face — with a cursive chapter accent per scene.
  */
 
 const FRAMES = [
@@ -16,31 +18,36 @@ const FRAMES = [
     src: '/images/pose-1.png',
     line: 'RUDRAKSH',
     sub: 'PATEL',
-    caption: 'SCENE 01 — THE PROTAGONIST',
+    accent: 'the protagonist',
+    side: 'left' as const,
   },
   {
     src: '/images/pose-2.png',
     line: 'I DREAM',
     sub: 'IN CODE',
-    caption: 'SCENE 02 — THE VISION',
+    accent: 'the vision',
+    side: 'right' as const,
   },
   {
     src: '/images/pose-3.png',
-    line: 'I BUILD',
-    sub: 'WITH AI',
-    caption: 'SCENE 03 — THE CRAFT',
+    line: 'AI ASSISTS.',
+    sub: 'I ARCHITECT.',
+    accent: 'the craft',
+    side: 'left' as const,
   },
   {
     src: '/images/pose-4.png',
     line: 'VIBE',
     sub: 'CODER',
-    caption: 'SCENE 04 — THE IDENTITY',
+    accent: 'the identity',
+    side: 'left' as const, // pose-4 palm presents toward viewer's left
   },
   {
     src: '/images/pose-5.png',
     line: 'WATCH ME',
     sub: 'SHIP IT',
-    caption: 'SCENE 05 — THE PROMISE',
+    accent: 'the promise',
+    side: 'right' as const,
   },
 ]
 
@@ -63,6 +70,25 @@ function frameOpacities(i: number): number[] {
   return [0, 1, 1, 0]
 }
 
+/** Typewriter that loops through the tagline */
+function Typewriter({ text }: { text: string }) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (count >= text.length) return
+    const t = setTimeout(() => setCount((c) => c + 1), 45)
+    return () => clearTimeout(t)
+  }, [count, text.length])
+
+  return (
+    <span aria-label={text}>
+      <span aria-hidden="true">{text.slice(0, count)}</span>
+      <span aria-hidden="true" className="animate-caret text-primary">
+        _
+      </span>
+    </span>
+  )
+}
+
 function StoryFrame({
   progress,
   index,
@@ -74,53 +100,33 @@ function StoryFrame({
   const opacity = useTransform(progress, frameWindow(index), frameOpacities(index))
   // subtle push-in per frame so each pose feels alive
   const seg = 1 / N
-  const scale = useTransform(progress, [index * seg, (index + 1) * seg], [1.02, 1.1])
-  const y = useTransform(progress, [index * seg, (index + 1) * seg], ['1.5%', '-1.5%'])
+  const scale = useTransform(progress, [index * seg, (index + 1) * seg], [1.01, 1.07])
+  const y = useTransform(progress, [index * seg, (index + 1) * seg], ['1%', '-1%'])
 
-  // Kinetic text slides opposite directions per frame
-  const dir = index % 2 === 0 ? 1 : -1
-  const lineX = useTransform(progress, [index * seg, (index + 1) * seg], [`${6 * dir}%`, `${-6 * dir}%`])
-  const subX = useTransform(progress, [index * seg, (index + 1) * seg], [`${-6 * dir}%`, `${6 * dir}%`])
+  // Kinetic text drifts gently, direction based on its side
+  const dir = frame.side === 'left' ? 1 : -1
+  const textY = useTransform(progress, [index * seg, (index + 1) * seg], ['10%', '-10%'])
+  const textX = useTransform(progress, [index * seg, (index + 1) * seg], [`${3 * dir}%`, `${-3 * dir}%`])
+
+  const sideClasses =
+    frame.side === 'left'
+      ? 'left-5 items-start text-left md:left-14'
+      : 'right-5 items-end text-right md:right-14'
 
   return (
     <>
-      {/* Giant kinetic story type behind the figure */}
-      <motion.div
-        style={{ opacity }}
-        aria-hidden={index !== 0}
-        className="absolute inset-0 flex flex-col items-center justify-center"
-      >
-        <h1 className={index === 0 ? 'contents' : 'sr-only'}>
-          <span className="sr-only">{PORTFOLIO.name} — {PORTFOLIO.role}</span>
-        </h1>
-        <motion.span
-          style={{ x: lineX }}
-          aria-hidden="true"
-          className="font-display block text-center text-[17vw] leading-[0.82] text-foreground md:text-[15vw]"
-        >
-          {frame.line}
-        </motion.span>
-        <motion.span
-          style={{ x: subX }}
-          aria-hidden="true"
-          className="font-display block text-center text-[17vw] leading-[0.82] text-primary md:text-[15vw]"
-        >
-          {frame.sub}
-        </motion.span>
-      </motion.div>
-
-      {/* The figure keyframe */}
+      {/* The figure keyframe — mix-blend-lighten melts pure black into the site bg */}
       <motion.div
         style={{ opacity, scale, y }}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 mx-auto h-[80vh] w-full max-w-2xl md:h-[92vh]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 mx-auto h-[78vh] w-full max-w-xl md:h-[88vh]"
       >
         <div
           className="absolute inset-0"
           style={{
             WebkitMaskImage:
-              'radial-gradient(58% 96% at 50% 100%, black 42%, transparent 72%)',
+              'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
             maskImage:
-              'radial-gradient(58% 96% at 50% 100%, black 42%, transparent 72%)',
+              'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
           }}
         >
           <Image
@@ -128,20 +134,46 @@ function StoryFrame({
             alt={index === 0 ? 'Rudraksh Patel in a tailored navy suit, emerald rim lighting' : ''}
             fill
             priority={index < 2}
-            className="object-contain object-bottom [filter:drop-shadow(0_0_70px_oklch(0.7_0.17_160/0.3))]"
+            className="mix-blend-lighten object-contain object-bottom [filter:brightness(0.96)_contrast(1.08)]"
           />
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background via-background/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/60 to-transparent" />
       </motion.div>
 
-      {/* Scene caption */}
+      {/* Story type beside the figure — clear of face and hands */}
       <motion.div
-        style={{ opacity }}
-        aria-hidden="true"
-        className="absolute right-5 top-20 z-20 md:right-10 md:top-24"
+        style={{ opacity, y: textY, x: textX }}
+        aria-hidden={index !== 0}
+        className={`absolute top-1/2 z-20 flex max-w-[46vw] -translate-y-1/2 flex-col gap-3 md:gap-4 ${sideClasses}`}
       >
-        <span className="border-l-2 border-primary pl-3 text-[11px] tracking-[0.35em] text-muted-foreground">
-          {frame.caption}
+        <h1 className={index === 0 ? 'contents' : 'sr-only'}>
+          <span className="sr-only">
+            {PORTFOLIO.name} — {PORTFOLIO.role}
+          </span>
+        </h1>
+        <span
+          aria-hidden="true"
+          className="font-cursive text-2xl leading-none text-primary md:text-4xl"
+        >
+          {frame.accent}
+        </span>
+        <span
+          aria-hidden="true"
+          className="font-display block text-[9vw] leading-[1.08] tracking-wide text-foreground md:text-[6.5vw]"
+        >
+          {frame.line}
+        </span>
+        <span
+          aria-hidden="true"
+          className="font-display block text-[9vw] leading-[1.08] tracking-wide text-primary [text-shadow:0_0_40px_oklch(0.7_0.17_160/0.4)] md:text-[6.5vw]"
+        >
+          {frame.sub}
+        </span>
+        <span
+          aria-hidden="true"
+          className="mt-1 border-l-2 border-primary pl-3 text-[10px] tracking-[0.4em] text-muted-foreground"
+        >
+          SCENE 0{index + 1} / 0{N}
         </span>
       </motion.div>
     </>
@@ -158,22 +190,22 @@ export function Hero() {
 
   // Progress bar + glow
   const barScale = useTransform(progress, [0, 1], [0, 1])
-  const glowOpacity = useTransform(progress, [0, 0.5, 1], [0.3, 0.65, 0.35])
+  const glowOpacity = useTransform(progress, [0, 0.5, 1], [0.25, 0.5, 0.3])
   const introOpacity = useTransform(progress, [0, 0.12], [1, 0])
 
   return (
     <section id="top" ref={ref} className="relative h-[500vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Ambient emerald glow */}
+        {/* Ambient emerald glow — sits behind the blended figure */}
         <motion.div
           style={{ opacity: glowOpacity }}
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 size-[75vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-[130px]"
+          className="absolute left-1/2 top-[58%] size-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-[140px]"
         />
         {/* Vignette for cinematic depth */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 [background:radial-gradient(120%_90%_at_50%_50%,transparent_60%,oklch(0.13_0.004_160/0.8)_100%)]"
+          className="pointer-events-none absolute inset-0 z-20 [background:radial-gradient(120%_90%_at_50%_50%,transparent_65%,oklch(0.13_0.004_160/0.7)_100%)]"
         />
 
         {FRAMES.map((_, i) => (
@@ -198,11 +230,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="max-w-xs text-pretty text-sm leading-relaxed text-foreground/85"
+            className="max-w-sm text-pretty text-sm leading-relaxed text-foreground/85"
           >
-            {PORTFOLIO.tagline}
-            <span className="mt-1 block text-xs tracking-[0.2em] text-primary">
-              SCROLL TO PLAY THE FILM
+            <Typewriter text={PORTFOLIO.tagline} />
+            <span className="mt-2 block text-xs tracking-[0.2em] text-primary">
+              SCROLL TO KNOW MY JOURNEY
             </span>
           </motion.p>
           <motion.div
@@ -229,7 +261,10 @@ export function Hero() {
         {/* Film progress bar */}
         <div className="absolute inset-x-0 bottom-12 z-30 px-5 md:px-10" aria-hidden="true">
           <div className="h-px w-full bg-border">
-            <motion.div style={{ scaleX: barScale }} className="h-px origin-left bg-primary shadow-[0_0_8px_oklch(0.7_0.17_160/0.8)]" />
+            <motion.div
+              style={{ scaleX: barScale }}
+              className="h-px origin-left bg-primary shadow-[0_0_8px_oklch(0.7_0.17_160/0.8)]"
+            />
           </div>
         </div>
 

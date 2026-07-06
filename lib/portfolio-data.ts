@@ -11,10 +11,10 @@ export const PORTFOLIO = {
   research:
     'Currently optimizing LLM context-window strategies and building OS-integrated automation tools that push the boundaries of desktop interactivity.',
   stats: [
-    { value: 1, suffix: '+', label: 'Solar Cycle Exp' },
+    { value: 100, suffix: '%', label: 'Vision & Architecture' },
     { value: 10, suffix: '+', label: 'Live Deployments' },
-    { value: 95, suffix: '%', label: 'Vibecoding' },
-    { value: 90, suffix: '%', label: 'AI Integration' },
+    { value: 80, suffix: '%', label: 'Vibecoding' },
+    { value: 100, suffix: '%', label: 'Deployment & Design' },
     { value: 88, suffix: '%', label: 'Bilingual AI (EN/HI)' },
   ],
   skills: [
@@ -33,7 +33,7 @@ export const PORTFOLIO = {
     {
       num: '01',
       title: 'Vibecoding',
-      desc: 'A methodology merging intuition with rapid iteration — using AI as a cognitive extension to ship high-performance products at impossible speed.',
+      desc: 'The vision, architecture, and every engineering decision are mine — AI is the instrument I conduct to ship at impossible speed.',
     },
     {
       num: '02',
@@ -91,8 +91,8 @@ KNOWLEDGE BASE:
 - Tagline: "Vibe. Code. Ascend." — Vibecoding digital companions and seamless shopping experiences through AI.
 - About: Redefining what a developer looks like in the AI era. His methodology "Vibecoding" merges intuition with rapid iteration, using AI as a cognitive extension to build high-performance digital companions.
 - Active research: Optimizing LLM context-window strategies and building OS-integrated automation tools that push the boundaries of desktop interactivity.
-- Stats: 1+ year (solar cycle) of experience, 10+ live deployments.
-- Skill levels: Vibecoding 95%, AI Integration 90%, Bilingual AI (EN/HI) 88%, React 85%, Python 80%, OS Automation 75%.
+- Stats: 10+ live deployments. Vision & software architecture: 100% his own. Deployment, design and manual engineering: 100% his own. Vibecoding (AI-assisted implementation): 80% — AI is his instrument, not his crutch. He architects, AI accelerates.
+- Skill levels: Vibecoding 80%, Bilingual AI (EN/HI) 88%, React 85%, Python 80%, OS Automation 75%.
 - Tech stack: React, TypeScript, Node.js, Python, Gemini AI, Tailwind CSS, Vercel, Netlify, Git, OS Automation.
 - Project 1 — Mehta's Mobiles: A trusted e-commerce platform for mobile phones and accessories with an integrated AI shopping assistant. Built with React, AI shopping features, and vibecoding. Live at https://mehtas-mobiles-platform-v-100.vercel.app/
 - Project 2 — Meet Jarvis (that's me!): A witty, bilingual (English/Hindi) AI companion that lives in the OS, not just the browser. Built with Python and automation. Source on his GitHub.
