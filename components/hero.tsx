@@ -124,9 +124,9 @@ function StoryFrame({
           className="absolute inset-0"
           style={{
             WebkitMaskImage:
-              'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+              'radial-gradient(75% 95% at 50% 70%, black 48%, transparent 78%)',
             maskImage:
-              'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+              'radial-gradient(75% 95% at 50% 70%, black 48%, transparent 78%)',
           }}
         >
           <Image
@@ -134,7 +134,7 @@ function StoryFrame({
             alt={index === 0 ? 'Rudraksh Patel in a tailored navy suit, emerald rim lighting' : ''}
             fill
             priority={index < 2}
-            className="mix-blend-lighten object-contain object-bottom [filter:brightness(0.96)_contrast(1.08)]"
+            className="mix-blend-lighten object-contain object-bottom [filter:brightness(0.94)_contrast(1.22)_saturate(1.05)]"
           />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background via-background/60 to-transparent" />
@@ -144,7 +144,7 @@ function StoryFrame({
       <motion.div
         style={{ opacity, y: textY, x: textX }}
         aria-hidden={index !== 0}
-        className={`absolute top-1/2 z-20 flex max-w-[46vw] -translate-y-1/2 flex-col gap-3 md:gap-4 ${sideClasses}`}
+        className={`absolute top-[42%] z-20 flex max-w-[46vw] -translate-y-1/2 flex-col gap-4 md:gap-5 ${sideClasses}`}
       >
         <h1 className={index === 0 ? 'contents' : 'sr-only'}>
           <span className="sr-only">
@@ -159,13 +159,13 @@ function StoryFrame({
         </span>
         <span
           aria-hidden="true"
-          className="font-display block text-[9vw] leading-[1.08] tracking-wide text-foreground md:text-[6.5vw]"
+          className="font-display block text-[8.5vw] leading-[1.15] tracking-wide text-foreground md:text-[6vw]"
         >
           {frame.line}
         </span>
         <span
           aria-hidden="true"
-          className="font-display block text-[9vw] leading-[1.08] tracking-wide text-primary [text-shadow:0_0_40px_oklch(0.7_0.17_160/0.4)] md:text-[6.5vw]"
+          className="font-display block text-[8.5vw] leading-[1.15] tracking-wide text-primary [text-shadow:0_0_40px_oklch(0.7_0.17_160/0.4)] md:text-[6vw]"
         >
           {frame.sub}
         </span>
