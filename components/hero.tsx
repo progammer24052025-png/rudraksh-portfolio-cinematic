@@ -2,154 +2,218 @@
 
 import { useRef } from 'react'
 import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from 'framer-motion'
 import { PORTFOLIO } from '@/lib/portfolio-data'
 
-const NAME = 'RUDRAKSH'
-const SURNAME = 'PATEL'
+/**
+ * Scroll-driven storytelling hero.
+ * Five pose keyframes of the suited figure crossfade as the user scrolls,
+ * each paired with a kinetic story line — reads like a movie scrubbed by scroll.
+ */
+
+const FRAMES = [
+  {
+    src: '/images/pose-1.png',
+    line: 'RUDRAKSH',
+    sub: 'PATEL',
+    caption: 'SCENE 01 — THE PROTAGONIST',
+  },
+  {
+    src: '/images/pose-2.png',
+    line: 'I DREAM',
+    sub: 'IN CODE',
+    caption: 'SCENE 02 — THE VISION',
+  },
+  {
+    src: '/images/pose-3.png',
+    line: 'I BUILD',
+    sub: 'WITH AI',
+    caption: 'SCENE 03 — THE CRAFT',
+  },
+  {
+    src: '/images/pose-4.png',
+    line: 'VIBE',
+    sub: 'CODER',
+    caption: 'SCENE 04 — THE IDENTITY',
+  },
+  {
+    src: '/images/pose-5.png',
+    line: 'WATCH ME',
+    sub: 'SHIP IT',
+    caption: 'SCENE 05 — THE PROMISE',
+  },
+]
+
+const N = FRAMES.length
+
+/** Opacity window for frame i across [0,1] scroll progress */
+function frameWindow(i: number): number[] {
+  const seg = 1 / N
+  const start = i * seg
+  const end = start + seg
+  const fade = seg * 0.28
+  if (i === 0) return [start, end - fade, end]
+  if (i === N - 1) return [start, start + fade, end]
+  return [start, start + fade, end - fade, end]
+}
+
+function frameOpacities(i: number): number[] {
+  if (i === 0) return [1, 1, 0]
+  if (i === N - 1) return [0, 1, 1]
+  return [0, 1, 1, 0]
+}
+
+function StoryFrame({
+  progress,
+  index,
+}: {
+  progress: MotionValue<number>
+  index: number
+}) {
+  const frame = FRAMES[index]
+  const opacity = useTransform(progress, frameWindow(index), frameOpacities(index))
+  // subtle push-in per frame so each pose feels alive
+  const seg = 1 / N
+  const scale = useTransform(progress, [index * seg, (index + 1) * seg], [1.02, 1.1])
+  const y = useTransform(progress, [index * seg, (index + 1) * seg], ['1.5%', '-1.5%'])
+
+  // Kinetic text slides opposite directions per frame
+  const dir = index % 2 === 0 ? 1 : -1
+  const lineX = useTransform(progress, [index * seg, (index + 1) * seg], [`${6 * dir}%`, `${-6 * dir}%`])
+  const subX = useTransform(progress, [index * seg, (index + 1) * seg], [`${-6 * dir}%`, `${6 * dir}%`])
+
+  return (
+    <>
+      {/* Giant kinetic story type behind the figure */}
+      <motion.div
+        style={{ opacity }}
+        aria-hidden={index !== 0}
+        className="absolute inset-0 flex flex-col items-center justify-center"
+      >
+        <h1 className={index === 0 ? 'contents' : 'sr-only'}>
+          <span className="sr-only">{PORTFOLIO.name} — {PORTFOLIO.role}</span>
+        </h1>
+        <motion.span
+          style={{ x: lineX }}
+          aria-hidden="true"
+          className="font-display block text-center text-[17vw] leading-[0.82] text-foreground md:text-[15vw]"
+        >
+          {frame.line}
+        </motion.span>
+        <motion.span
+          style={{ x: subX }}
+          aria-hidden="true"
+          className="font-display block text-center text-[17vw] leading-[0.82] text-primary md:text-[15vw]"
+        >
+          {frame.sub}
+        </motion.span>
+      </motion.div>
+
+      {/* The figure keyframe */}
+      <motion.div
+        style={{ opacity, scale, y }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 mx-auto h-[80vh] w-full max-w-2xl md:h-[92vh]"
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            WebkitMaskImage:
+              'radial-gradient(58% 96% at 50% 100%, black 42%, transparent 72%)',
+            maskImage:
+              'radial-gradient(58% 96% at 50% 100%, black 42%, transparent 72%)',
+          }}
+        >
+          <Image
+            src={frame.src || "/placeholder.svg"}
+            alt={index === 0 ? 'Rudraksh Patel in a tailored navy suit, emerald rim lighting' : ''}
+            fill
+            priority={index < 2}
+            className="object-contain object-bottom [filter:drop-shadow(0_0_70px_oklch(0.7_0.17_160/0.3))]"
+          />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-background via-background/70 to-transparent" />
+      </motion.div>
+
+      {/* Scene caption */}
+      <motion.div
+        style={{ opacity }}
+        aria-hidden="true"
+        className="absolute right-5 top-20 z-20 md:right-10 md:top-24"
+      >
+        <span className="border-l-2 border-primary pl-3 text-[11px] tracking-[0.35em] text-muted-foreground">
+          {frame.caption}
+        </span>
+      </motion.div>
+    </>
+  )
+}
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start start', 'end start'],
+    offset: ['start start', 'end end'],
   })
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 })
 
-  // Figure: rises slightly, scales up and drifts as you scroll
-  const figureY = useTransform(scrollYProgress, [0, 1], ['0%', '18%'])
-  const figureScale = useTransform(scrollYProgress, [0, 1], [1, 1.25])
-  const figureOpacity = useTransform(scrollYProgress, [0, 0.75, 1], [1, 0.85, 0.25])
-
-  // Name letters: split apart in opposite directions behind the figure
-  const nameX = useTransform(scrollYProgress, [0, 1], ['0%', '-12%'])
-  const surnameX = useTransform(scrollYProgress, [0, 1], ['0%', '12%'])
-  const nameOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.15])
-
-  // Foreground copy fades early
-  const subOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0])
-
-  // Ambient glow intensifies mid-scroll
-  const glowOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.35, 0.7, 0.1])
+  // Progress bar + glow
+  const barScale = useTransform(progress, [0, 1], [0, 1])
+  const glowOpacity = useTransform(progress, [0, 0.5, 1], [0.3, 0.65, 0.35])
+  const introOpacity = useTransform(progress, [0, 0.12], [1, 0])
 
   return (
-    <section id="top" ref={ref} className="relative h-[240vh]">
-      <div className="sticky top-0 flex h-screen flex-col justify-end overflow-hidden">
-        {/* Emerald ambient glow */}
+    <section id="top" ref={ref} className="relative h-[500vh]">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        {/* Ambient emerald glow */}
         <motion.div
           style={{ opacity: glowOpacity }}
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 -z-0 size-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-[120px]"
+          className="absolute left-1/2 top-1/2 size-[75vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/25 blur-[130px]"
+        />
+        {/* Vignette for cinematic depth */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-20 [background:radial-gradient(120%_90%_at_50%_50%,transparent_60%,oklch(0.13_0.004_160/0.8)_100%)]"
         />
 
-        {/* Giant name behind the figure */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <h1 className="font-display leading-[0.82] text-foreground">
-            <span className="sr-only">{PORTFOLIO.name}</span>
-            <motion.span
-              aria-hidden="true"
-              style={{ x: nameX, opacity: nameOpacity }}
-              className="block text-center text-[20vw] md:text-[18vw]"
-            >
-              {NAME.split('').map((ch, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ y: '110%', opacity: 0 }}
-                  animate={{ y: '0%', opacity: 1 }}
-                  transition={{ delay: 0.08 * i, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block"
-                >
-                  {ch}
-                </motion.span>
-              ))}
-            </motion.span>
-            <motion.span
-              aria-hidden="true"
-              style={{ x: surnameX, opacity: nameOpacity }}
-              className="block text-center text-[20vw] text-primary md:text-[18vw]"
-            >
-              {SURNAME.split('').map((ch, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ y: '110%', opacity: 0 }}
-                  animate={{ y: '0%', opacity: 1 }}
-                  transition={{ delay: 0.6 + 0.08 * i, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block"
-                >
-                  {ch}
-                </motion.span>
-              ))}
-            </motion.span>
-          </h1>
-        </div>
-
-        {/* Suited figure in front of the type, moving on scroll */}
-        <motion.div
-          style={{ y: figureY, scale: figureScale, opacity: figureOpacity }}
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 mx-auto h-[78vh] w-full max-w-2xl md:h-[88vh]"
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              maskImage:
-                'linear-gradient(to right, transparent, black 22%, black 78%, transparent), linear-gradient(to bottom, transparent, black 18%)',
-              maskComposite: 'intersect',
-              WebkitMaskImage:
-                'linear-gradient(to right, transparent, black 22%, black 78%, transparent), linear-gradient(to bottom, transparent, black 18%)',
-              WebkitMaskComposite: 'source-in',
-            }}
-          >
-            <Image
-              src="/images/rudraksh-suit.png"
-              alt="Rudraksh Patel standing in a tailored navy suit with emerald rim lighting"
-              fill
-              priority
-              className="object-contain object-bottom [filter:drop-shadow(0_0_60px_oklch(0.7_0.17_160/0.25))]"
-            />
-          </div>
-          {/* Ground fade so the figure melts into the page */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
-        </motion.div>
+        {FRAMES.map((_, i) => (
+          <StoryFrame key={i} progress={progress} index={i} />
+        ))}
 
         {/* Status line */}
-        <motion.div
-          style={{ opacity: subOpacity }}
-          className="absolute left-0 top-20 z-20 flex items-center gap-3 px-5 md:top-24 md:px-10"
-        >
+        <div className="absolute left-0 top-20 z-30 flex items-center gap-3 px-5 md:top-24 md:px-10">
           <span className="inline-block size-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />
           <span className="text-xs tracking-[0.3em] text-primary">SYSTEM: ONLINE</span>
           <span className="hidden text-xs tracking-[0.3em] text-muted-foreground md:inline">
             # {PORTFOLIO.role.toUpperCase()}
           </span>
-        </motion.div>
+        </div>
 
-        {/* Tagline + CTAs pinned to corners */}
+        {/* Intro copy + CTAs, fade after first chapter */}
         <motion.div
-          style={{ opacity: subOpacity }}
-          className="relative z-20 flex flex-col gap-6 px-5 pb-16 md:flex-row md:items-end md:justify-between md:px-10"
+          style={{ opacity: introOpacity }}
+          className="absolute inset-x-0 bottom-16 z-30 flex flex-col gap-6 px-5 md:flex-row md:items-end md:justify-between md:px-10"
         >
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5, duration: 0.8 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
             className="max-w-xs text-pretty text-sm leading-relaxed text-foreground/85"
           >
             {PORTFOLIO.tagline}
             <span className="mt-1 block text-xs tracking-[0.2em] text-primary">
-              INITIATING CREATIVE PROTOCOL 01...
+              SCROLL TO PLAY THE FILM
             </span>
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.7, duration: 0.8 }}
+            transition={{ delay: 1, duration: 0.8 }}
             className="flex flex-wrap gap-4"
           >
             <a
               href="#labs"
-              className="bg-primary px-6 py-3 text-xs font-medium tracking-[0.25em] text-primary-foreground transition-transform hover:scale-105"
+              className="bg-primary px-6 py-3 text-xs font-medium tracking-[0.25em] text-primary-foreground shadow-[0_0_30px_oklch(0.7_0.17_160/0.35)] transition-transform hover:scale-105"
             >
               ACCESS LABS
             </a>
@@ -162,14 +226,18 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
+        {/* Film progress bar */}
+        <div className="absolute inset-x-0 bottom-12 z-30 px-5 md:px-10" aria-hidden="true">
+          <div className="h-px w-full bg-border">
+            <motion.div style={{ scaleX: barScale }} className="h-px origin-left bg-primary shadow-[0_0_8px_oklch(0.7_0.17_160/0.8)]" />
+          </div>
+        </div>
+
         {/* Skills marquee */}
-        <div className="relative z-20 overflow-hidden border-t border-border bg-background/80 py-3 backdrop-blur-sm">
+        <div className="absolute inset-x-0 bottom-0 z-30 overflow-hidden border-t border-border bg-background/80 py-3 backdrop-blur-sm">
           <div className="animate-marquee flex w-max gap-8" aria-hidden="true">
             {[...PORTFOLIO.skills, ...PORTFOLIO.skills].map((s, i) => (
-              <span
-                key={i}
-                className="flex items-center gap-8 text-xs tracking-[0.3em] text-muted-foreground"
-              >
+              <span key={i} className="flex items-center gap-8 text-xs tracking-[0.3em] text-muted-foreground">
                 <span className="text-primary">/</span>
                 {s.toUpperCase()}
               </span>

@@ -19,6 +19,12 @@ export async function POST(req: Request) {
   })
 
   return createUIMessageStreamResponse({
-    stream: toUIMessageStream({ stream: result.stream }),
+    stream: toUIMessageStream({
+      stream: result.stream,
+      onError: (error) => {
+        console.log('[v0] Jarvis chat error:', error)
+        return 'Jarvis hit a glitch. Please try again.'
+      },
+    }),
   })
 }
