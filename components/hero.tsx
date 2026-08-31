@@ -37,8 +37,8 @@ const FRAMES = [
   },
   {
     src: '/images/pose-4.png',
-    line: 'VIBE',
-    sub: 'CODER',
+    line: 'Faster',
+    sub: 'Shipments',
     accent: 'the identity',
     side: 'left' as const, // pose-4 palm presents toward viewer's left
   },
