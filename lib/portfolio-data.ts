@@ -31,8 +31,7 @@ export const PORTFOLIO = {
   pillars: [
     {
       num: '01',
-      title: 'Vibecoding',
-      desc: 'TFull Ownership',
+      title: 'Full Ownership',
       desc: 'Every decision from architecture to deployment is mine. I own the complete lifecycle of what I build—vision, design, implementation, and shipping.',
     },
     {
@@ -43,8 +42,8 @@ export const PORTFOLIO = {
     {
       num: '03',
       title: 'System Design',
-      desc: 'Crafting tools and automation across platforms—web, desktop, and OS-level. Pushing boundaries of what digital products can do'
-    }
+      desc: 'Crafting tools and automation across platforms—web, desktop, and OS-level. Pushing boundaries of what digital products can do.',
+    },
   ],
   projects: [
     {
